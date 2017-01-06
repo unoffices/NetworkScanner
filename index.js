@@ -73,7 +73,7 @@ function GetByIp(arr, value) {
 
 var count = 0;
 hosts.forEach(function (host) {
-    
+
     var _self = this;
     _self.msg = '';
     ping.sys.probe(host, function (isAlive) {
@@ -86,7 +86,9 @@ hosts.forEach(function (host) {
             } else {
                 msg = isAlive ? "unkown " + host + " is alive\n" : '';
             }
-            console.log(msg);
+            if (msg != '') {
+                console.log(msg);
+            }
             if (reply != isAlive.toString()) {
                 if (msg != '') {
                     slack.alert(msg, function (err) {
@@ -97,8 +99,8 @@ hosts.forEach(function (host) {
                 }
             }
             redisClient.set(host, isAlive);
-            count ++;
-            if (count == hosts.length){
+            count++;
+            if (count == hosts.length) {
                 process.exit();
             }
         })
