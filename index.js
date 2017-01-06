@@ -1,10 +1,14 @@
 var ping = require('ping');
+var redis = require('redis');
+var redisClient = redis.createClient();
+var slack = require('slack-notify')(process.env.SLACK_WEBHOOK_URL);
+
+
 var baseIP = '192.168.1.';
-var dns = require('dns');
 var hosts = [];
 var aliveHosts = [];
 
-for (var x = 1; x != 100; x++) {
+for (var x = 1; x != 255; x++) {
     hosts.push(baseIP + x);
 }
 
@@ -52,34 +56,44 @@ var devices = [
         'name': 'Dev Server',
         'ip': '192.168.1.18'
     },
-	{
-		'name': "Jenni's iPhone",
-		'ip':'192.168.1.15'
-	}
+    {
+        'name': "Jenni's iPhone",
+        'ip': '192.168.1.15'
+    }
 ]
 
+function GetByIp(arr, value) {
+    var result = arr.filter(function (o) {
+        return o.ip == value;
+    });
+    return result ? result[0] : null;
 
+}
 
 hosts.forEach(function (host) {
+    var _self = this;
+    _self.msg = '';
     ping.sys.probe(host, function (isAlive) {
-	var name = GetByIp(devices, host);
-	var msg ='';
-	//console.log(name);
-        if (name != undefined){
-		msg = isAlive ? name.name + " " + host + ' is alive' : name.name + " " + host + ' is dead'; 
-	}else{
-		msg = isAlive ? "unkown " + host + " is alive" : '';
-	}	
-	if (msg != '') console.log(msg);
+        redisClient.get(host, function (err, reply) {
+            var msg = ''
+            var name = GetByIp(devices, host);
+
+            if (name != undefined) {
+                msg = isAlive ? name.name + " " + host + ' is alive \n' : name.name + " " + host + ' is dead\n';
+            } else {
+                msg = isAlive ? "unkown " + host + " is alive\n" : '';
+            }
+            if (reply != isAlive) {
+                if (msg != '') {
+                    slack.alert(msg, function (err) {
+                        console.log(err);
+                    });
+                }
+            }
+            redisClient.set(host, isAlive);
+        })
+
     });
 });
 
 
-function GetByIp(arr, value)
-{
-	var result = arr.filter(function(o) {
-		return o.ip == value;
-	});
-	return result ? result[0]: null;
-
-}
