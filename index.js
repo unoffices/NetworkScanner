@@ -86,6 +86,7 @@ hosts.forEach(function (host) {
             } else {
                 msg = isAlive ? "unkown " + host + " is alive\n" : '';
             }
+            console.log(msg);
             if (reply != isAlive.toString()) {
                 if (msg != '') {
                     slack.alert(msg, function (err) {
