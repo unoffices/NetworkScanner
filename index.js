@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var ping = require('ping');
 var redis = require('redis');
 var redisClient = redis.createClient();
