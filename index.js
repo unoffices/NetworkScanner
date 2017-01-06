@@ -3,6 +3,7 @@ var ping = require('ping');
 var redis = require('redis');
 var redisClient = redis.createClient();
 var slack = require('slack-notify')(process.env.SLACK_WEBHOOK_URL);
+var fs = require('fs');
 
 
 var baseIP = '192.168.1.';
@@ -82,9 +83,9 @@ hosts.forEach(function (host) {
             var name = GetByIp(devices, host);
 
             if (name != undefined) {
-                msg = isAlive ? name.name + " " + host + ' is alive \n' : name.name + " " + host + ' is dead\n';
+                msg = isAlive ? name.name + " " + host + ' is alive' : name.name + " " + host + ' is dead';
             } else {
-                msg = isAlive ? "unkown " + host + " is alive\n" : '';
+                msg = isAlive ? "unkown " + host + " is alive" : '';
             }
             if (msg != '') {
                 console.log(msg);
@@ -101,7 +102,17 @@ hosts.forEach(function (host) {
             redisClient.set(host, isAlive);
             count++;
             if (count == hosts.length) {
-                process.exit();
+                var currentdate = new Date();
+                var datetime = "Last Sync: " + currentdate.getDate() + "/"
+                    + (currentdate.getMonth() + 1) + "/"
+                    + currentdate.getFullYear() + " @ "
+                    + currentdate.getHours() + ":"
+                    + currentdate.getMinutes() + ":"
+                    + currentdate.getSeconds() + "\n";
+                fs.appendFile('logs.txt', datetime, function (err) {
+                    process.exit();
+                });
+
             }
         })
 
