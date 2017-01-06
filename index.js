@@ -71,7 +71,9 @@ function GetByIp(arr, value) {
 
 }
 
+var count = 0;
 hosts.forEach(function (host) {
+    
     var _self = this;
     _self.msg = '';
     ping.sys.probe(host, function (isAlive) {
@@ -84,17 +86,24 @@ hosts.forEach(function (host) {
             } else {
                 msg = isAlive ? "unkown " + host + " is alive\n" : '';
             }
-            if (reply != isAlive) {
+            if (reply != isAlive.toString()) {
                 if (msg != '') {
                     slack.alert(msg, function (err) {
-                        console.log(err);
+                        if (err) {
+                            console.log(err);
+                        }
                     });
                 }
             }
             redisClient.set(host, isAlive);
+            count ++;
+            if (count == hosts.length){
+                process.exit();
+            }
         })
 
     });
+
 });
 
 
