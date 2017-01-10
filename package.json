@@ -7,13 +7,14 @@
     "type": "git",
     "url": "git+https://github.com/codeiain/NetworkScanner.git"
   },
-  "author": "",
+  "author": "codeiain",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/codeiain/NetworkScanner/issues"
   },
   "homepage": "https://github.com/codeiain/NetworkScanner#readme",
   "dependencies": {
+    "cron": "^1.2.1",
     "ping": "^0.2.1",
     "redis": "^2.6.3",
     "slack-notify": "^0.1.6"

@@ -1,10 +1,9 @@
-#!/usr/bin/env node
+var CronJob = require('cron').CronJob;
 var ping = require('ping');
 var redis = require('redis');
 var redisClient = redis.createClient();
 var slack = require('slack-notify')(process.env.SLACK_WEBHOOK_URL);
 var fs = require('fs');
-
 
 var baseIP = '192.168.1.';
 var hosts = [];
@@ -72,6 +71,9 @@ function GetByIp(arr, value) {
 
 }
 
+new CronJob('0 */30 * * * *', function() {
+
+
 var count = 0;
 hosts.forEach(function (host) {
 
@@ -87,11 +89,9 @@ hosts.forEach(function (host) {
             } else {
                 msg = isAlive ? "unkown " + host + " is alive" : '';
             }
-            if (msg != '') {
-                console.log(msg);
-            }
             if (reply != isAlive.toString()) {
                 if (msg != '') {
+                    console.log(err);
                     slack.alert(msg, function (err) {
                         if (err) {
                             console.log(err);
@@ -110,7 +110,7 @@ hosts.forEach(function (host) {
                     + currentdate.getMinutes() + ":"
                     + currentdate.getSeconds() + "\n";
                 fs.appendFile('logs.txt', datetime, function (err) {
-                    process.exit();
+                   
                 });
 
             }
@@ -121,3 +121,6 @@ hosts.forEach(function (host) {
 });
 
 
+
+
+}, null, true, 'America/Los_Angeles');
