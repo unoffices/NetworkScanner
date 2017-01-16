@@ -60,6 +60,10 @@ var devices = [
     {
         'name': "Jenni's iPhone",
         'ip': '192.168.1.15'
+    },
+    {
+        'name':'Iain`s iPhone',
+        'ip':'192.168.1.9'
     }
 ]
 
